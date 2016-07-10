@@ -66,7 +66,7 @@ public class SQLEngine {
 			ResultSet rs = stmt.executeQuery();
 			
 			rs.next();
-			System.out.println(rs.getInt("total"));
+//			System.out.println(rs.getInt("total"));
 			if (rs.getInt("total") > 0){
 				return exists.YES;
 			}
@@ -115,7 +115,7 @@ public class SQLEngine {
 		if (!connect())
 			return false;
 		
-		Instant start = Instant.now();
+//		Instant start = Instant.now();
 		exists check = recipeExists(newRec);
 		if (check == exists.NO){
 			return false;
@@ -127,11 +127,11 @@ public class SQLEngine {
 		if (oldRec == null){
 			return false;
 		}
-		Instant end = Instant.now();
-		System.out.println(1 + " " + Duration.between(start, end));
+//		Instant end = Instant.now();
+//		System.out.println(1 + " " + Duration.between(start, end));
 		
 		try {
-			start = Instant.now();
+//			start = Instant.now();
 			//UPDATE the fields stored within the 'recipes' table.
 			//UPDATE course, prepTime, cookTime, rating, servings, lastModificationDate WHERE title
 			sql = "UPDATE recipes SET course = ?, prepTime = ?, cookTime = ?, rating = ?, servings = ?, lastModificationDate = ? WHERE title = ?";
@@ -145,10 +145,10 @@ public class SQLEngine {
 			stmt.setString(7, newRec.getTitle());
 			stmt.execute();
 			System.out.println("Updated 'recipes'");
-			end = Instant.now();
-			System.out.println(2 + " " + Duration.between(start, end));
+//			end = Instant.now();
+//			System.out.println(2 + " " + Duration.between(start, end));
 			
-			start = Instant.now();
+//			start = Instant.now();
 			//DELETE and INSERT ingredients if and only if the ingredients have been changed.
 			if (!selectIngredients(oldRec).equals(newRec.getIngredients())){
 				sql = "DELETE FROM ingredients WHERE title = ?";
@@ -179,9 +179,9 @@ public class SQLEngine {
 				System.out.println("Updated 'tags'");
 			}
 			
-			end = Instant.now();
+//			end = Instant.now();
 			
-			System.out.println(3 + " " + Duration.between(start, end));
+//			System.out.println(3 + " " + Duration.between(start, end));
 			
 			return true;
 		} catch (IOException | SQLException e){

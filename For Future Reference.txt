@@ -1,0 +1,4 @@
+To configure a web server for using special characters:
+http://stackoverflow.com/questions/138948/how-to-get-utf-8-working-in-java-webapps
+Also, in the web app, set the character encoding as follows:
+http://stackoverflow.com/questions/10517268/how-to-pass-unicode-characters-as-jsp-servlet-request-getparameter

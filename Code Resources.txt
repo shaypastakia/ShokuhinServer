@@ -1,0 +1,15 @@
+//Request a Recipe, and parse it from JSON
+	RequestURL req = new RequestURL("192.168.1.147");
+	req.addParameter("type", "REQUEST");
+	req.addParameter("recipe", "Blueberry Muffins");
+
+	responseStr = RecipeMethodsMobile.request(req);
+	ObjectMapper mapper = new ObjectMapper();
+	Recipe r = mapper.readValue(responseStr, Recipe.class);
+	
+	
+	
+                    if (s.toLowerCase().contains("blueberry")){
+                        for (String s2 : r.getIngredients())
+                            Toast.makeText(main.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                    }

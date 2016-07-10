@@ -5,6 +5,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * 
  * @author Shaylen Pastakia
@@ -37,8 +40,10 @@ public class Recipe implements Serializable{
 	 * <br>
 	 * Populate every field when creating a new recipe
 	 */
-	public Recipe (String title, ArrayList<String> ingredients, ArrayList<String> methodSteps,
-			   int course, ArrayList<String> tags, int prepTime, int cookTime, int rating, int servings){
+	@JsonCreator
+	public Recipe (@JsonProperty("title") String title,@JsonProperty("ingredients") ArrayList<String> ingredients,@JsonProperty("methodSteps") ArrayList<String> methodSteps,
+				   @JsonProperty("course") int course, @JsonProperty("tags") ArrayList<String> tags, @JsonProperty("prepTime") int prepTime,
+				   @JsonProperty("cookTime") int cookTime, @JsonProperty("rating") int rating, @JsonProperty("servings") int servings){
 		this.title = title;
 		this.ingredients = ingredients;
 		this.methodSteps = methodSteps;

@@ -1,5 +1,9 @@
 package webEngine;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -34,8 +38,13 @@ public class WebEngine extends HttpServlet{
 		}
 		engine = new SQLEngine("jdbc:postgresql://localhost:5432/shokuhin", "read", "read");
 	}
+	
+//	public void service(HttpServletRequest request, HttpServletResponse response){
+//		System.out.println(request.getMethod());
+//	}
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("GET");
 		PrintWriter out = response.getWriter();
 		
 		if (request.getParameterMap().containsKey("title")){
@@ -72,19 +81,20 @@ public class WebEngine extends HttpServlet{
 //		
 //		html += "</ul>";
 		
-		html += "<table>";
+		html += "<table border=\"1\">";
 		for (Pair<String, Timestamp> s : recipes){
 			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s.getKey());
 			html += "<tr><th><a href=\"" + ref + "\">" + s.getKey() + "</a></th>" + "<th>(" + s.getValue() + ")</th>"+ "</tr>";
 		}
 		
-		html += "</table";
+		html += "</table>";
 		out.write(html);
 		out.close();
 		return;
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("POST");
 		/*Create a Session
 		 *
 		 *If the session is new, take the Client's MINE argument.
@@ -106,6 +116,9 @@ public class WebEngine extends HttpServlet{
 
 		// Set response content type
 		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		
 		ObjectMapper mapper = new ObjectMapper();
 		String json;
 		PrintWriter out;
@@ -115,7 +128,7 @@ public class WebEngine extends HttpServlet{
 			//			Logic
 			
 			json = mapper.writeValueAsString(engine.getAllRecipeTitles());
-			out = response.getWriter();
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8")), true);
 			out.write(json);
 			out.close();
 			break;
@@ -138,9 +151,19 @@ public class WebEngine extends HttpServlet{
 			//			LOGIC + SECOND ARG (RECIPE TITLE)
 
 			break;
-		case "UPLOAD":
+		case "SENDTIMES":
 			//			LOGIC + Ability to retrieve a file from the client.
-
+			String temp;
+			String resp;
+			BufferedReader bufRead = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+			String line;
+	        StringBuffer req = new StringBuffer();
+	        while ((line = bufRead.readLine()) != null) {
+	            req.append(line);
+	            req.append('\r');
+	        }
+	        bufRead.close();
+	        System.out.println(request.getParameter("type"));
 			break;
 		case "DELETE":
 			//			Logic

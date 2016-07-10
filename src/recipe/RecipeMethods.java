@@ -17,11 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.HashMap;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -161,12 +159,13 @@ public class RecipeMethods {
 	 * Produce a list of all recipes, as well as their date of last modification.
 	 * @return An ArrayList of Pairs, where the Pair contains the Recipe Title, and the LastModificationDate
 	 */
-	public static ArrayList<Pair<String, Timestamp>> getLastModificationDates(){
+	public static HashMap<String, Timestamp> getLastModificationDates(){
 		ArrayList<Recipe> recs = readAllRecipes();
-		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+//		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+		HashMap<String, Timestamp> temp = new HashMap<String, Timestamp>();
 		
 		for (Recipe r : recs)
-			temp.add(new Pair<String, Timestamp>(r.getTitle(), r.getLastModificationDate()));
+			temp.put(r.getTitle(), r.getLastModificationDate());
 		
 		return temp;
 	}
