@@ -10,11 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
-import javafx.util.Pair;
 import recipe.Recipe;
 import recipe.RecipeMethods;
 
@@ -254,19 +253,19 @@ public class SQLEngine {
 	 * Get all the recipe titles, and their last modification dates.
 	 * @return A list of Pairs. Each Pair contains the name of all recipes, and the date they were last modified.
 	 */
-	public ArrayList<Pair<String, Timestamp>> getLastModificationDates(){
+	public TreeMap<String, Timestamp> getLastModificationDates(){
 		if (!connect())
 			return null;
 
 		try {
-		ArrayList<Pair<String, Timestamp>> temp = new ArrayList<Pair<String, Timestamp>>();
+			TreeMap<String, Timestamp> temp = new TreeMap<String, Timestamp>();
 		
-		sql = "SELECT title, lastModificationDate FROM recipes";
+		sql = "SELECT title, lastModificationDate FROM recipes ORDER BY title";
 		stmt = conn.prepareStatement(sql);
 		ResultSet result = stmt.executeQuery();
 		
 		while (result.next()){
-			temp.add(new Pair<String, Timestamp>(result.getString(1), result.getTimestamp(2)));
+			temp.put(result.getString(1), result.getTimestamp(2));
 		}
 		
 		return temp;

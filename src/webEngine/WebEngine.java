@@ -1,14 +1,12 @@
 package webEngine;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Scanner;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +18,6 @@ import org.apache.commons.httpclient.util.URIUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javafx.util.Pair;
 import recipe.Recipe;
 import recipe.RecipeHTML;
 
@@ -58,33 +55,24 @@ public class WebEngine extends HttpServlet{
 		
 		response.setContentType("text/html");
 //		ArrayList<String> recipes = engine.getAllRecipeTitles();
-		ArrayList<Pair<String, Timestamp>> recipes = engine.getLastModificationDates();
+		TreeMap<String, Timestamp> recipes = engine.getLastModificationDates();
 		
-		Collections.sort(recipes, new Comparator<Pair<String, Timestamp>>() {
-			@Override
-			public int compare(Pair<String, Timestamp> arg0, Pair<String, Timestamp> arg1) {
-				return arg0.getKey().compareToIgnoreCase(arg1.getKey());
-			}
-	    });
+//		Collections.sort(recipes, new Comparator<Pair<String, Timestamp>>() {
+//			@Override
+//			public int compare(Pair<String, Timestamp> arg0, Pair<String, Timestamp> arg1) {
+//				return arg0.getKey().compareToIgnoreCase(arg1.getKey());
+//			}
+//	    });
 		
 		
 		String html = "";
 		html += "<h1>Welcome to Shokuhin!</h1><br /><br />";
 		html += "<h2>The recipes currently on the server are:</h2>";
-//		html += "<ul>";
-//		
-//		
-//		for (Pair<String, Timestamp> s : recipes){
-//			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s.getKey());
-//			html += "<li><a href=\"" + ref + "\">" + s.getKey() + "</a>" + " (" + s.getValue() + ") "+ "</li>";
-//		}
-//		
-//		html += "</ul>";
 		
 		html += "<table border=\"1\">";
-		for (Pair<String, Timestamp> s : recipes){
-			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s.getKey());
-			html += "<tr><th><a href=\"" + ref + "\">" + s.getKey() + "</a></th>" + "<th>(" + s.getValue() + ")</th>"+ "</tr>";
+		for (String s : recipes.keySet()){
+			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s);
+			html += "<tr><th><a href=\"" + ref + "\">" + s + "</a></th>" + "<th>(" + recipes.get(s) + ")</th>"+ "</tr>";
 		}
 		
 		html += "</table>";
@@ -118,29 +106,18 @@ public class WebEngine extends HttpServlet{
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
+		String s;
+		Enumeration<String> strings = request.getHeaderNames();
+
+		while ((s = strings.nextElement()) != null)
+		System.out.println(s + ": " + request.getHeader(s));
 		
 		ObjectMapper mapper = new ObjectMapper();
 		String json;
 		PrintWriter out;
 		
 		switch (request.getParameter("type")) {
-		case "MINE":	
-			//			Logic
-			
-			json = mapper.writeValueAsString(engine.getAllRecipeTitles());
-			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8")), true);
-			out.write(json);
-			out.close();
-			break;
-		case "NEW":
-			//			Logic
-
-			break;
-		case "UPDATE":
-			//			Logic
-
-			break;
-		case "REQUEST":
+		case "REQUEST": //Client requests a single recipe. Server sends it.
 			//Decoding from http://stackoverflow.com/questions/573184/java-convert-string-to-valid-uri-object
 			String rec = URIUtil.decode(request.getParameter("recipe"));
 			Recipe r = engine.getRecipe(rec);
@@ -151,23 +128,25 @@ public class WebEngine extends HttpServlet{
 			//			LOGIC + SECOND ARG (RECIPE TITLE)
 
 			break;
-		case "SENDTIMES":
-			//			LOGIC + Ability to retrieve a file from the client.
-			String temp;
-			String resp;
-			BufferedReader bufRead = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
-			String line;
-	        StringBuffer req = new StringBuffer();
-	        while ((line = bufRead.readLine()) != null) {
-	            req.append(line);
-	            req.append('\r');
-	        }
-	        bufRead.close();
-	        System.out.println(request.getParameter("type"));
-			break;
-		case "DELETE":
-			//			Logic
+		case "SENDTIMES": //Client sends its list of Recipes. Response with NEW, UPDATE, DELETE recipes as a HashMap<String, String>
+			//Answer by limc, on http://stackoverflow.com/questions/5175203/httpservlet-request-getinputstream-always-receiving-blank-line
+		    StringBuilder stringBuilder = new StringBuilder(1000);
+		    Scanner scanner = new Scanner(request.getInputStream());
+		    while (scanner.hasNextLine()) {
+		        stringBuilder.append(scanner.nextLine());
+		    }
+		    
+		    String resp = stringBuilder.toString();
 
+		    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    mapper.setDateFormat(format);
+		    TreeMap<String, Long> clientTimes = mapper.readValue(resp, new TreeMap<String, Long>().getClass());
+		    TreeMap<String, String> results = getNewUpdateDelete(clientTimes);
+		    
+		    json = mapper.writeValueAsString(results);
+		    out = response.getWriter();
+		    out.write(json);
+			out.close();
 			break;
 		default:
 			break;
@@ -177,6 +156,40 @@ public class WebEngine extends HttpServlet{
 	public void destroy()
 	{
 		// do nothing.
+	}
+	
+	private TreeMap<String, String> getNewUpdateDelete(TreeMap<String, Long> clientTimes){
+		TreeMap<String, String> temp = new TreeMap<String, String>();
+		
+		TreeMap<String, Timestamp> remoteTimes = engine.getLastModificationDates();
+
+		if (clientTimes == null || clientTimes.isEmpty())
+			for (String s : remoteTimes.keySet())
+				temp.put(s, "NEW");
+		
+		for (String s : remoteTimes.keySet()){
+			if (!clientTimes.containsKey(s)){ //If the Server contains a Recipe that the Client doesn't have.
+				temp.put(s, "NEW");
+			} else if (clientTimes.containsKey(s)){ //If both devices have the Recipe, check for UPDATE
+				
+				Date serverDate = new Date(remoteTimes.get(s).getTime());
+				Date clientDate = new Date(clientTimes.get(s));
+				if (serverDate.after(clientDate) && !serverDate.equals(clientDate)){
+					temp.put(s, "UPDATE");
+				}
+			}
+			
+		}
+		
+		for (String s : clientTimes.keySet()){
+			if (!remoteTimes.containsKey(s)) //If the Client has a recipe that the Server doesn't have, then delete it.
+				temp.put(s, "DELETE");
+		}
+		
+		for (String s : temp.keySet()){
+			System.out.println(s + ": " + temp.get(s));
+		}
+		return temp;
 	}
 
 }
