@@ -1,0 +1,13 @@
+Commands.
+Firstly, open Git Shell.
+Navigate to the ShokuhinServer folder.
+perform:
+	git add .
+	git commit -m <message>
+	git push heroku master
+	
+To scale web:
+	heroku ps:scale web=1
+	
+To deploy:
+	mvn clean heroku:deploy-war

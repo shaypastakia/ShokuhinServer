@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -499,10 +501,29 @@ public class SQLEngine {
 		return temp;
 	}
 	
+	private boolean connect(){
+
+	    try {
+			
+		    URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+		    String username = dbUri.getUserInfo().split(":")[0];
+		    String password = dbUri.getUserInfo().split(":")[1];
+		    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+		    
+		    conn = DriverManager.getConnection(dbUrl, username, password);
+		    
+		    return true;
+		} catch (URISyntaxException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	/**
 	 * Connect to the SQL Server
 	 */
-	private boolean connect(){
+	private boolean connectVOID(){
 		if (db_url == null || db_url.equals("") || user == null){
 			return false;
 		}
