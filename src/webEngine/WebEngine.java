@@ -79,14 +79,14 @@ public class WebEngine extends HttpServlet{
 		html += "<h2 style=\"color:black;\">The recipes currently on the server are:</h2>";
 		html += "<div style=\"float:left\"><table border=\"0\">";
 		for (String s : recipes.keySet()){
-			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s);
+			String ref = URIUtil.encodeQuery("/shokuhin?title=" + s);
 			html += "<tr><th><a href=\"" + ref + "\">" + s + "</a></th>" + "<th style=\"color:black;\">(" + recipes.get(s) + ")</th>"+ "</tr>";
 		}
 		
 		engine.getMostRecentRecipe();
 		html += "</table></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
 		
-		html += "<div style=\"float:left\"><table border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/ShokuhinServer/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td><td>" +
+		html += "<div style=\"float:left\"><table border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td><td>" +
 		new RecipeHTML(showRec).getHTML() + "</td></table></div>";
 		
 		html += "</body></html>";

@@ -1,0 +1,3 @@
+In ShokuhinServer, WebEngine, change all references to /shokuhin to /ShokuhinServer/shokuhin
+
+In ShokuhinMobile, RequestURL, comment out #temp += ":8080/ShokuhinServer/shokuhin";

@@ -516,9 +516,9 @@ public class SQLEngine {
 		    	conn = DriverManager.getConnection(dbUrl, username, password);
 		    
 		    return true;
-		} catch (URISyntaxException | SQLException e) {
+		} catch (NullPointerException | URISyntaxException | SQLException e) {
 			e.printStackTrace();
-			return false;
+			return connectVOID();
 		}
 	}
 	
