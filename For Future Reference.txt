@@ -2,3 +2,7 @@ To configure a web server for using special characters:
 http://stackoverflow.com/questions/138948/how-to-get-utf-8-working-in-java-webapps
 Also, in the web app, set the character encoding as follows:
 http://stackoverflow.com/questions/10517268/how-to-pass-unicode-characters-as-jsp-servlet-request-getparameter
+
+If there's an issue with TomCat and APR:
+Download the binaries, and put the **64-bit** files in sys32: http://tomcat.apache.org/download-native.cgi
+Edit server.xml: http://www.coderanch.com/t/541334/Tomcat/Installing-APR-Windows

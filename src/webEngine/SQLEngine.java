@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import recipe.Recipe;
@@ -189,6 +188,21 @@ public class SQLEngine {
 		}
 	}
 	
+	public Recipe getMostRecentRecipe(){
+		if (!connect())
+			return null;
+		
+		try {
+			sql = "SELECT title FROM recipes ORDER BY lastModificationDate DESC LIMIT 1";
+			stmt = conn.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			return getRecipe(rs.getString(1));
+			
+		} catch (Exception e){
+			return null;
+		}
+	}
 	/**
 	 * Retrieve a Recipe in its entirety from the SQL Server
 	 * @param title The name of the Recipe to retrieve
@@ -298,23 +312,6 @@ public class SQLEngine {
 		} catch (SQLException e){
 			e.printStackTrace();
 			return null;
-		}
-	}
-	
-	/**
-	 * Remove this method once complete
-	 */
-	private boolean execute(String s){
-		if (!connect())
-			return false;
-
-		try {
-			sql = s;
-			stmt = conn.prepareStatement(sql);
-			return stmt.execute();
-		} catch (SQLException e){
-			e.printStackTrace();
-			return false;
 		}
 	}
 	
@@ -513,8 +510,6 @@ public class SQLEngine {
 		try {
 			if (conn != null && conn.isValid(5))
 				return true;
-			
-			System.out.println("Connecting");
 			conn = DriverManager.getConnection(db_url, user, pass);
 			return true;
 			

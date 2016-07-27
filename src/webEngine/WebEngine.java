@@ -23,6 +23,8 @@ import recipe.RecipeHTML;
 
 @WebServlet("/shokuhin")
 public class WebEngine extends HttpServlet{
+
+	private static final long serialVersionUID = 8186358153531802098L;
 	SQLEngine engine;
 
 	public void init() throws ServletException {
@@ -34,17 +36,22 @@ public class WebEngine extends HttpServlet{
 			e.printStackTrace();
 		}
 		engine = new SQLEngine("jdbc:postgresql://localhost:5432/shokuhin", "read", "read");
+//		engine = new SQLEngine("jdbc:postgresql://127.13.121.130:5432/recipes", "shokuhin", "shokuhin");
 	}
-	
-//	public void service(HttpServletRequest request, HttpServletResponse response){
-//		System.out.println(request.getMethod());
-//	}
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("------------------------------");
 		System.out.println("GET");
+		String s2;
+		Enumeration<String> strings = request.getHeaderNames();
+		while ((s2 = strings.nextElement()) != null)
+		System.out.println(s2 + ": " + request.getHeader(s2));
+	    
 		PrintWriter out = response.getWriter();
 		
-		if (request.getParameterMap().containsKey("title")){
+		Recipe showRec = engine.getMostRecentRecipe();
+		
+		if (request.getParameterMap().containsKey("print")){
 			Recipe r = engine.getRecipe(URIUtil.decode(request.getParameter("title")));
 			String html = "<a href=\"javascript:history.back()\">Go Back</a>";
 			html += new RecipeHTML(r).getHTML();
@@ -53,54 +60,44 @@ public class WebEngine extends HttpServlet{
 			return;
 		}
 		
-		response.setContentType("text/html");
-//		ArrayList<String> recipes = engine.getAllRecipeTitles();
-		TreeMap<String, Timestamp> recipes = engine.getLastModificationDates();
-		
-//		Collections.sort(recipes, new Comparator<Pair<String, Timestamp>>() {
-//			@Override
-//			public int compare(Pair<String, Timestamp> arg0, Pair<String, Timestamp> arg1) {
-//				return arg0.getKey().compareToIgnoreCase(arg1.getKey());
-//			}
-//	    });
-		
-		
-		String html = "";
-		html += "<h1>Welcome to Shokuhin!</h1><br /><br />";
-		html += "<h2>The recipes currently on the server are:</h2>";
-		
-		html += "<table border=\"1\">";
-		for (String s : recipes.keySet()){
-			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s);
-			html += "<tr><th><a href=\"" + ref + "\">" + s + "</a></th>" + "<th>(" + recipes.get(s) + ")</th>"+ "</tr>";
+		if (request.getParameterMap().containsKey("title")){
+			showRec = engine.getRecipe(request.getParameter("title"));
 		}
 		
-		html += "</table>";
+		System.out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()) + ": " + request.getParameter("title"));
+		response.setContentType("text/html");
+		TreeMap<String, Timestamp> recipes = engine.getLastModificationDates();		
+		
+		String html = "";
+		html += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
+		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
+		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
+		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black}" +
+		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\"><table style=\"width: 100%\"><tr bgcolor=\"#DDDDDD\">" +
+		"<td style=\"width: 126px\"><span class=\"auto-style2\"><img alt=\"Shokuhin Logo\" height=\"87\" src=" + request.getContextPath() + "/images/ShokuhinLogo.png style=\"float: left\" width=\"109\" /></span></td>" + 
+		"<td><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></td></tr></table>";
+		html += "<h2 style=\"color:black;\">The recipes currently on the server are:</h2>";
+		html += "<div style=\"float:left\"><table border=\"0\">";
+		for (String s : recipes.keySet()){
+			String ref = URIUtil.encodeQuery("/ShokuhinServer/shokuhin?title=" + s);
+			html += "<tr><th><a href=\"" + ref + "\">" + s + "</a></th>" + "<th style=\"color:black;\">(" + recipes.get(s) + ")</th>"+ "</tr>";
+		}
+		
+		engine.getMostRecentRecipe();
+		html += "</table></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
+		
+		html += "<div style=\"float:left\"><table border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/ShokuhinServer/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td><td>" +
+		new RecipeHTML(showRec).getHTML() + "</td></table></div>";
+		
+		html += "</body></html>";
 		out.write(html);
 		out.close();
 		return;
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("------------------------------");
 		System.out.println("POST");
-		/*Create a Session
-		 *
-		 *If the session is new, take the Client's MINE argument.
-		 *Process it against the SQL Server to work out the NEW, UPDATE, and DELETE files
-		 *Produce these three lists, as JSON Objects, produced from an ArrayList of Recipes. Empty where necessary.
-		 *Send a SUCCESS/FAIL object to the Client
-		 *
-		 */
-
-		/*Existing Session
-		 * 
-		 * If the session exists, take the Client's NEW, UPDATE, DELETE argument
-		 * As per the argument, send across the NEW, UPDATE, or DELETE JSON Object
-		 * Where the object is DELETE, you should also delete the session afterwards
-		 * Should also be able to UPLOAD a recipe, as well as REQUEST a recipe
-		 */
-
-		//THE PHONE SHOULD ASK USER IF SHOULD UPLOAD OR DELETE, AS WELL AS ADD NEW AND UPDATE
 
 		// Set response content type
 		response.setContentType("application/json");
@@ -108,7 +105,6 @@ public class WebEngine extends HttpServlet{
 		request.setCharacterEncoding("UTF-8");
 		String s;
 		Enumeration<String> strings = request.getHeaderNames();
-
 		while ((s = strings.nextElement()) != null)
 		System.out.println(s + ": " + request.getHeader(s));
 		
@@ -117,6 +113,13 @@ public class WebEngine extends HttpServlet{
 		PrintWriter out;
 		
 		switch (request.getParameter("type")) {
+		case "ONLINE":
+			response.setContentType("text/plain");
+			out = response.getWriter();
+			out.write("true");
+			out.close();
+			System.out.println(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(new Date()) + " - Checked online status");
+			break;
 		case "REQUEST": //Client requests a single recipe. Server sends it.
 			//Decoding from http://stackoverflow.com/questions/573184/java-convert-string-to-valid-uri-object
 			String rec = URIUtil.decode(request.getParameter("recipe"));
@@ -125,8 +128,7 @@ public class WebEngine extends HttpServlet{
 			out = response.getWriter();
 			out.write(json);
 			out.close();
-			//			LOGIC + SECOND ARG (RECIPE TITLE)
-
+			System.out.println(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(new Date()) + " - Requested: " + r.getTitle());
 			break;
 		case "SENDTIMES": //Client sends its list of Recipes. Response with NEW, UPDATE, DELETE recipes as a HashMap<String, String>
 			//Answer by limc, on http://stackoverflow.com/questions/5175203/httpservlet-request-getinputstream-always-receiving-blank-line
@@ -147,6 +149,7 @@ public class WebEngine extends HttpServlet{
 		    out = response.getWriter();
 		    out.write(json);
 			out.close();
+			System.out.println(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(new Date()) + " - Responding with NEW, UPDATE, DELETE");
 			break;
 		default:
 			break;
