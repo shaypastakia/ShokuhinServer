@@ -511,7 +511,9 @@ public class SQLEngine {
 		    String password = dbUri.getUserInfo().split(":")[1];
 		    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
 		    
-		    conn = DriverManager.getConnection(dbUrl, username, password);
+		    if (conn != null && conn.isValid(5))
+				return true;
+		    	conn = DriverManager.getConnection(dbUrl, username, password);
 		    
 		    return true;
 		} catch (URISyntaxException | SQLException e) {
