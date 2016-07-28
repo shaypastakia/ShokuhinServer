@@ -73,14 +73,23 @@ public class WebEngine extends HttpServlet{
 		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
 		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black}" +
-		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\"><table style=\"width: 100%\"><tr bgcolor=\"#DDDDDD\">" +
+		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\"><table style=\"width: 100%\"><tr bgcolor=\"#BBBBBB\">" +
 		"<td style=\"width: 126px\"><span class=\"auto-style2\"><img alt=\"Shokuhin Logo\" height=\"87\" src=" + request.getContextPath() + "/images/ShokuhinLogo.png style=\"float: left\" width=\"109\" /></span></td>" + 
-		"<td><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></td></tr></table>";
-		html += "<h2 style=\"color:black;\">The recipes currently on the server are:</h2>";
+		"<th><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></th></tr></table>";
 		html += "<div style=\"float:left\"><table border=\"0\">";
 		for (String s : recipes.keySet()){
 			String ref = URIUtil.encodeQuery("/shokuhin?title=" + s);
-			html += "<tr><th><a href=\"" + ref + "\">" + s + "</a></th>" + "<th style=\"color:black;\">(" + recipes.get(s) + ")</th>"+ "</tr>";
+			String colour = "DDDDDD";
+			Enumeration<String> params = request.getParameterNames();
+			while (params.hasMoreElements()){
+				String param = params.nextElement();
+				if (param.equals("title")){
+					String title = request.getParameter("title");
+					if (s.replaceAll(" ", "%20").equals(title))
+						colour = "AAAAAA";
+				}
+			}
+			html += "<tr><td onMouseOver=\"this.bgColor='#AAAAAA'\" onMouseOut=\"this.bgColor='#" + colour + "'\" bgcolor='#" + colour + "'><b><a href=\"" + ref + "\">" + s + "</a></b></td>" + "</tr>";
 		}
 		
 		engine.getMostRecentRecipe();
