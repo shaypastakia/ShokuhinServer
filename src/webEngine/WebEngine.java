@@ -73,23 +73,21 @@ public class WebEngine extends HttpServlet{
 		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
 		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black}" +
-		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\"><table style=\"width: 100%\"><tr bgcolor=\"#BBBBBB\">" +
+		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
+		
+		+ "<table style=\"width: 100%; border: 4px solid gray; border-radius 8px\"><tr bgcolor=\"#BBBBBB\">" + //table containing header
+		
 		"<td style=\"width: 126px\"><span class=\"auto-style2\"><img alt=\"Shokuhin Logo\" height=\"87\" src=" + request.getContextPath() + "/images/ShokuhinLogo.png style=\"float: left\" width=\"109\" /></span></td>" + 
+		
 		"<th><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></th></tr></table>";
+		
 		html += "<div style=\"float:left\"><table border=\"0\">";
+		
 		for (String s : recipes.keySet()){
 			String ref = URIUtil.encodeQuery("/shokuhin?title=" + s);
 			String colour = "DDDDDD";
-			Enumeration<String> params = request.getParameterNames();
-			while (params.hasMoreElements()){
-				String param = params.nextElement();
-				if (param.equals("title")){
-					String title = request.getParameter("title");
-					if (s.replaceAll(" ", "%20").equals(title))
-						colour = "AAAAAA";
-				}
-			}
-			html += "<tr><td onMouseOver=\"this.bgColor='#AAAAAA'\" onMouseOut=\"this.bgColor='#" + colour + "'\" bgcolor='#" + colour + "'><b><a href=\"" + ref + "\">" + s + "</a></b></td>" + "</tr>";
+
+			html += "<tr><td onMouseOver=\"this.bgColor='#BBBBBB'\" onMouseOut=\"this.bgColor='#" + colour + "'\" bgcolor='#" + colour + "'><b><a style=\"text-decoration:none;\" href=\"" + ref + "\">" + s + "</a></b></td>" + "</tr>";
 		}
 		
 		engine.getMostRecentRecipe();
