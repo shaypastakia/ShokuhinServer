@@ -70,16 +70,23 @@ public class WebEngine extends HttpServlet{
 		
 		String html = "";
 		html += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
-		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
+		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>"
+		
+		
+		+ "<meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
-		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black}" +
+		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black;border-collapse: collapse}" +
 		"</style></head><body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
 		
-		+ "<table style=\"width: 100%; border: 4px solid gray; border-radius 8px\"><tr bgcolor=\"#BBBBBB\">" + //table containing header
+		+ "<table style=\"width: 100%; border-collapse: collapse; \">"
+		
+		+ "<tr bgcolor=\"#BBBBBB\">" + //table row containing header (image + heading)
 		
 		"<td style=\"width: 126px\"><span class=\"auto-style2\"><img alt=\"Shokuhin Logo\" height=\"87\" src=" + request.getContextPath() + "/images/ShokuhinLogo.png style=\"float: left\" width=\"109\" /></span></td>" + 
 		
 		"<th><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></th></tr></table>";
+		
+		html += "<table style=\"height: 10px\"><tr></tr></table>";
 		
 		html += "<div style=\"float:left\"><table border=\"0\">";
 		
@@ -93,8 +100,8 @@ public class WebEngine extends HttpServlet{
 		engine.getMostRecentRecipe();
 		html += "</table></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
 		
-		html += "<div style=\"float:left\"><table border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td><td>" +
-		new RecipeHTML(showRec).getHTML() + "</td></table></div>";
+		html += "<div style=\"float:left\"><table bgcolor=\"#E0E0E0\" style=\"width: 100%; box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\" border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td>"
+				+ "<td>" +	new RecipeHTML(showRec).getHTML() + "</td></table></div>";
 		
 		html += "</body></html>";
 		out.write(html);
