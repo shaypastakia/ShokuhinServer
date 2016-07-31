@@ -26,6 +26,44 @@ public class WebEngine extends HttpServlet{
 
 	private static final long serialVersionUID = 8186358153531802098L;
 	SQLEngine engine;
+	public static final String image = "coffee.jpg";
+	
+	//Fade delay by http://devinvinson.com/delayed-fade-in-effects-with-css/ AND http://stackoverflow.com/questions/18265846/css-animation-delay-not-working
+	public static final String style = "<style>"
+			+ "@keyframes fadein {from { opacity: 0; }to   { opacity: 0.85; }}"
+			+ "@-moz-keyframes fadein {from { opacity: 0; }to   { opacity: 0.85; }}"
+			+ "@-webkit-keyframes fadein {from { opacity: 0; }to   { opacity: 0.85; }}"
+			+ "@-ms-keyframes fadein {from { opacity: 0; }to   { opacity: 0.85; }}"
+			+ "@-o-keyframes fadein {from { opacity: 0; }to   { opacity: 0.85; }}"
+			
+			+ "div {"
+			+ "font-family: Sans-Serif;"
+			+ "font-size: 22;"
+			+ "}"
+			
+			+ " .one, .two, .three {"
+			+ "opacity: 0;"
+			+ "background: rgba(200, 200, 200, 0.85); "
+			+ "-moz-animation: fadein 1s ease-in forwards; "
+			+ "-webkit-animation: fadein 1s ease-in forwards; "
+			+ "-o-animation: fadein 1s ease-in forwards; "
+			+ "}"
+			+ "</style>";
+	public static final String style2 = "<style> .a, .b, .c {"
+			+ "-moz-animation: fadein 1s ease-in forwards; "
+			+ "-webkit-animation: fadein 1s ease-in forwards; "
+			+ "-o-animation: fadein 1s ease-in forwards; "
+			+ "}"
+			+ "@keyframes fadein {from { opacity: 0; }to   { opacity: 1; }}"
+			+ "@-moz-keyframes fadein {from { opacity: 0; }to   { opacity: 1; }}"
+			+ "@-webkit-keyframes fadein {from { opacity: 0; }to   { opacity: 1; }}"
+			+ "@-ms-keyframes fadein {from { opacity: 0; }to   { opacity: 1; }}"
+			+ "@-o-keyframes fadein {from { opacity: 0; }to   { opacity: 1; }}"
+			+ "</style>";
+	public static final String style3 = "<style>"
+			+ ".one, .a {-moz-animation-delay: 0s;-webkit-animation-delay: 0s;-o-animation-delay: 0s;animation-delay: 0s;}"
+			+ ".two, .b {-moz-animation-delay: 0.75s;-webkit-animation-delay: 0.75s;-o-animation-delay: 0.75s;animation-delay: 0.75s;}"
+			+ ".three, .c {-moz-animation-delay: 1.5s;-webkit-animation-delay: 1.5s;-o-animation-delay: 1.5s;animation-delay: 1.5s;}";
 
 	public void init() throws ServletException {
 		// Do required initialization
@@ -70,38 +108,36 @@ public class WebEngine extends HttpServlet{
 		
 		String html = "";
 		html += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
-		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>"
-		
+		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" + style + style2 + style3		
 		
 		+ "<meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
 		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black;border-collapse: collapse}" +
-		"</style></head><body background=" + request.getContextPath() + "/images/wallpaper.jpg link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
+		"</style></head><body background=" + request.getContextPath() + "/images/" + image + " link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
 		
-		+ "<table style=\"width: 100%; border-collapse: collapse; background: rgba(200, 200, 200, 0.9); \">"
+		+ "<div class=\"one\"><div class=\"a\"><table style=\"width: 100%; border-collapse: collapse; \">"
 		
 		+ "<tr >" + //table row containing header (image + heading)
 		
 		"<td style=\"width: 126px\"><span class=\"auto-style2\"><img alt=\"Shokuhin Logo\" height=\"87\" src=" + request.getContextPath() + "/images/ShokuhinLogo.png style=\"float: left\" width=\"109\" /></span></td>" + 
 		
-		"<th><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></th></tr></table>";
+		"<th><h1><span class=\"auto-style2\">Welcome to Shokuhin</span></h1></th></tr></table></div></div>";
 		
 		html += "<table style=\"height: 10px\"><tr></tr></table>";
 		
-		html += "<div style=\"float:left\"><table border=\"0\">";
+		html += "<div class=\"two\" style=\"float:left\"> <div class=\"b\"><table border=\"0\">";
 		
 		for (String s : recipes.keySet()){
 			String ref = URIUtil.encodeQuery("/shokuhin?title=" + s);
-			String colour = "C8C8C8";
 
-			html += "<tr><td onMouseOver=\"this.bgColor='#BBBBBB'\" onMouseOut=\"this.bgColor='#" + colour + "'\" bgcolor='#" + colour + "'><b><a style=\"text-decoration:none;\" href=\"" + ref + "\">" + s + "</a></b></td>" + "</tr>";
+			html += "<tr><td onMouseOver=\" this.style.backgroundColor='rgba(200, 200, 200, 1)' \" onMouseOut=\" this.style.backgroundColor='rgba(200, 200, 200, 0)' \"><b><a style=\"text-decoration:none;\" href=\"" + ref + "\">" + s + "</a></b></td>" + "</tr>";
 		}
 		
 		engine.getMostRecentRecipe();
-		html += "</table></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
+		html += "</table></div></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
 		
-		html += "<div style=\"float:left; background: rgba(200, 200, 200, 0.9);\"><table style=\"width: 100%; box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\" border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td>"
-				+ "<td>" +	new RecipeHTML(showRec).getHTML() + "</td></table></div>";
+		html += "<div class=\"three\" style=\"float:left;\"><div class=\"c\"><table style=\"width: 100%; box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\" border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td>"
+				+ "<td>" +	new RecipeHTML(showRec).getHTML() + "</td></table></div></div>";
 		
 		html += "</body></html>";
 		out.write(html);
