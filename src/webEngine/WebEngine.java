@@ -64,13 +64,12 @@ public class WebEngine extends HttpServlet{
 			+ ".one, .a {-moz-animation-delay: 0s;-webkit-animation-delay: 0s;-o-animation-delay: 0s;animation-delay: 0s;}"
 			+ ".two, .b {-moz-animation-delay: 0.75s;-webkit-animation-delay: 0.75s;-o-animation-delay: 0.75s;animation-delay: 0.75s;}"
 			+ ".three, .c {-moz-animation-delay: 1.5s;-webkit-animation-delay: 1.5s;-o-animation-delay: 1.5s;animation-delay: 1.5s;}";
-
+	
 	public void init() throws ServletException {
 		// Do required initialization
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		engine = new SQLEngine("jdbc:postgresql://localhost:5432/shokuhin", "read", "read");
@@ -108,8 +107,8 @@ public class WebEngine extends HttpServlet{
 		
 		String html = "";
 		html += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
-		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" + style + style2 + style3		
-		
+		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" + style + style2 + style3
+
 		+ "<meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
 		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black;border-collapse: collapse}" +

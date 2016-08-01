@@ -35,9 +35,23 @@ public class RecipeHTML
 		
 		// Append Servings to info
 		info = info.concat("<li>Serves: " + recipe.getServings() + "</li>");
-		info = info.concat("</ul>");
 		
-		info = info.concat("<br />");
+		String tags = "<li>Tags: ";
+		for (String s : recipe.getTags())
+		{
+			tags = tags.concat(s);
+			if (recipe.getTags().indexOf(s) < recipe.getTags().size() - 1)
+			{
+				tags = tags.concat(", ");
+			}
+			else
+			{
+				tags = tags.concat(".").trim();
+			}
+		}
+		info = info.concat(tags + "</li><br />");
+		
+		info = info.concat("</ul>\n");
 		
 		String ingredientsHeader = "<h2>Ingredients</h2>";
 		String ingredientsList = "<ul>\n";
