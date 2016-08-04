@@ -1,4 +1,6 @@
 package webEngine;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
@@ -8,11 +10,13 @@ import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.httpclient.util.URIUtil;
 
@@ -48,6 +52,13 @@ public class WebEngine extends HttpServlet{
 			+ "-webkit-animation: fadein 1s ease-in forwards; "
 			+ "-o-animation: fadein 1s ease-in forwards; "
 			+ "}"
+			
+			+ "img {"
+			+ "opacity: 0;"
+			+ "-moz-animation: fadein 1s ease-in forwards; "
+			+ "-webkit-animation: fadein 1s ease-in forwards; "
+			+ "-o-animation: fadein 1s ease-in forwards; "
+			+ "}"
 			+ "</style>";
 	public static final String style2 = "<style> .a, .b, .c {"
 			+ "-moz-animation: fadein 1s ease-in forwards; "
@@ -62,8 +73,9 @@ public class WebEngine extends HttpServlet{
 			+ "</style>";
 	public static final String style3 = "<style>"
 			+ ".one, .a {-moz-animation-delay: 0s;-webkit-animation-delay: 0s;-o-animation-delay: 0s;animation-delay: 0s;}"
-			+ ".two, .b {-moz-animation-delay: 0.75s;-webkit-animation-delay: 0.75s;-o-animation-delay: 0.75s;animation-delay: 0.75s;}"
-			+ ".three, .c {-moz-animation-delay: 1.5s;-webkit-animation-delay: 1.5s;-o-animation-delay: 1.5s;animation-delay: 1.5s;}";
+			+ ".two, .b {-moz-animation-delay: 0.5s;-webkit-animation-delay: 0.5s;-o-animation-delay: 0.5s;animation-delay: 0.5s;}"
+			+ ".three, .c {-moz-animation-delay: 1s;-webkit-animation-delay: 1s;-o-animation-delay: 1s;animation-delay: 1s;}"
+			+ "img {-moz-animation-delay: 1.5s;-webkit-animation-delay: 1.5s;-o-animation-delay: 1.5s;animation-delay: 1.5s;}";
 	
 	public void init() throws ServletException {
 		// Do required initialization
@@ -140,6 +152,33 @@ public class WebEngine extends HttpServlet{
 		
 		html += "<div class=\"three\" style=\"float:left;\"><div class=\"c\"><table style=\"width: 100%; box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\" border=\"0\"><tr><td style=\"color:black;\"><b><a href=\"/shokuhin?print=true&title=" + showRec.getTitle() + "\">Print Recipe</b></tr></td>"
 				+ "<td>" +	new RecipeHTML(showRec).getHTML() + "</td></table></div></div>";
+		
+		
+		try {
+			//As per http://stackoverflow.com/questions/15127100/store-and-retrieve-images-in-postgresql-using-java
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			BufferedImage img = engine.getImage(showRec.getTitle());
+			
+			if (img != null){
+				html += "</table></div></div>" + "<div style=\"float:left\"><table style=\"width: 50px\"><td><tr></tr></td></table></div>";
+				ImageIO.write(img, "jpg", baos);
+	
+		        String data = DatatypeConverter.printBase64Binary(baos.toByteArray());
+		        String imageString = "data:image/png;base64," + data;
+		        String scale;
+		        if (img.getWidth() > img.getHeight())
+		        	scale = "width='600px'";
+		        else 
+		        	scale = "height='600px'";
+		        html += "<div id=four style=\"float:left;\"> <img " + scale +  " src='";
+		        html += imageString + "'> </div>";
+			}
+			
+		} catch (Exception e){
+			System.out.println("Failed to load image");
+			e.printStackTrace();
+		}
+			
 		
 		html += "</body></html>";
 		out.write(html);
