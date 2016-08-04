@@ -1,5 +1,7 @@
 package webEngine;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -14,6 +16,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import javax.imageio.ImageIO;
 
 import recipe.Recipe;
 import recipe.RecipeMethods;
@@ -107,6 +111,32 @@ public class SQLEngine {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public BufferedImage getImage(String title){
+		if (!connect())
+			return null;
+		
+		
+		try {
+			//As per https://www.postgresql.org/docs/7.4/static/jdbc-binary-data.html
+			PreparedStatement ps = conn.prepareStatement("SELECT image FROM images WHERE title = ?");
+			ps.setString(1, title);
+			ResultSet rs;
+			rs = ps.executeQuery();
+			    while (rs.next()) {
+			        byte[] imgBytes = rs.getBytes(1);
+			        BufferedImage img = ImageIO.read(new ByteArrayInputStream(imgBytes));
+			        return img;
+			    }
+			    rs.close();
+			ps.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+		
 	}
 	
 	
@@ -517,7 +547,6 @@ public class SQLEngine {
 		    
 		    return true;
 		} catch (NullPointerException | URISyntaxException | SQLException e) {
-			e.printStackTrace();
 			return connectVOID();
 		}
 	}
