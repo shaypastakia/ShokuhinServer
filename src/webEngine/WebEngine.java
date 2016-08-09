@@ -127,7 +127,7 @@ public class WebEngine extends HttpServlet{
 		html += "<meta content=\"en-gb\" http-equiv=\"Content-Language\" />" + 
 		"<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\" />" + 
 		"<title>Shokuhin</title><style type=\"text/css\">.auto-style2 {font-family: \"DejaVu Sans\";color:black;border-collapse: collapse}" +
-		"</style></head><body background=" + request.getContextPath() + "/images/" + image + " link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
+		"</style></head><style>body {background-attachment: fixed; }</style><body background=" + request.getContextPath() + "/images/" + image + " link=\"#000000\" vlink=\"#000000\" alink=\"#000000\" bgcolor=\"#DDDDDD\">"
 		
 		+ "<div class=\"one\"><div class=\"a\"><table style=\"width: 100%; border-collapse: collapse; \">"
 		
