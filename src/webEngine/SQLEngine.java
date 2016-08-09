@@ -543,7 +543,7 @@ public class SQLEngine {
 		    
 		    if (conn != null && conn.isValid(5))
 				return true;
-//		    	conn = DriverManager.getConnection(dbUrl, username, password);
+		    	conn = DriverManager.getConnection(dbUrl, username, password);
 		    
 		    return true;
 		} catch (NullPointerException | URISyntaxException | SQLException e) {
