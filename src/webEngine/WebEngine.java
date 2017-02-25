@@ -30,6 +30,8 @@ public class WebEngine extends HttpServlet{
 
 	private static final long serialVersionUID = 8186358153531802098L;
 	SQLEngine engine;
+	SMTPEngine smtpEngine;
+	
 	public static final String image = "coffee.jpg";
 	
 	//Fade delay by http://devinvinson.com/delayed-fade-in-effects-with-css/ AND http://stackoverflow.com/questions/18265846/css-animation-delay-not-working
@@ -86,6 +88,8 @@ public class WebEngine extends HttpServlet{
 		}
 		engine = new SQLEngine("jdbc:postgresql://localhost:5432/shokuhin", "read", "read");
 //		engine = new SQLEngine("jdbc:postgresql://127.13.121.130:5432/recipes", "shokuhin", "shokuhin");
+		
+		smtpEngine = new SMTPEngine("recipe.shokuhin@gmail.com", "30954214");
 	}
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -241,6 +245,16 @@ public class WebEngine extends HttpServlet{
 		    out.write(json);
 			out.close();
 			System.out.println(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(new Date()) + " - Responding with NEW, UPDATE, DELETE");
+			break;
+		case "SENDRECIPE":
+			String title = URIUtil.decode(request.getParameter("recipe"));
+			Recipe recipe = engine.getRecipe(title);
+			String email = URIUtil.decode(request.getParameter("email"));
+			try {
+				smtpEngine.sendRecipe(recipe, email);
+			} catch (Exception e){
+				System.out.println("Failed to send email\n" + e.getMessage());
+			}
 			break;
 		default:
 			break;
