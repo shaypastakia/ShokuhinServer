@@ -3,7 +3,7 @@ Firstly, open Git Shell.
 Navigate to the ShokuhinServer folder.
 perform:
 	git add .
-	git commit -m <message>
+	git commit -m "message"
 	git push heroku master
 	
 To scale web:

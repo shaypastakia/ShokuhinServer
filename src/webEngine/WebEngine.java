@@ -249,7 +249,7 @@ public class WebEngine extends HttpServlet{
 		case "SENDRECIPE":
 			String title = URIUtil.decode(request.getParameter("recipe"));
 			Recipe recipe = engine.getRecipe(title);
-			String email = URIUtil.decode(request.getParameter("email"));
+			String email = URIUtil.decode(request.getParameter("email").replaceAll("%40", "@"));
 			try {
 				smtpEngine.sendRecipe(recipe, email);
 			} catch (Exception e){

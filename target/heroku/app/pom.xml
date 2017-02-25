@@ -208,6 +208,10 @@
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 	
@@ -241,4 +245,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>javax.mail-api</artifactId>
+				<version>1.5.6</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
