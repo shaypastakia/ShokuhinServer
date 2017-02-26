@@ -25,6 +25,7 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.commons.httpclient.util.URIUtil;
 
 import recipe.Recipe;
+import recipe.RecipeHTML;
 
 public class SMTPEngine {
 	
@@ -55,7 +56,7 @@ public class SMTPEngine {
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 		
 		String bodyText = "To view this recipe on the Shokuhin website, please click this link:\n"
-				+ "<a href=\"http://www.shokuhin.herokuapp.com/shokuhin?title="
+				+ "<a href=\"http://shokuhin.herokuapp.com/shokuhin?title="
 				+ URIUtil.encodeAll(r.getTitle())
 				+ "\">"
 				+ r.getTitle() + "</a><br /><br />"
@@ -69,24 +70,27 @@ public class SMTPEngine {
 		multi.addBodyPart(bodyPart);
 		
 		BodyPart attachment = new MimeBodyPart();
+//		File tempFile = File.createTempFile(r.getTitle(),".html");
+//		tempFile.deleteOnExit();
+//		
+//		OutputStream fileOut = Files.newOutputStream(tempFile.toPath());
+//		BufferedOutputStream buff = new BufferedOutputStream(fileOut);
+//		ObjectOutputStream obj = new ObjectOutputStream(buff);
+//		obj.writeObject(r);
+//		obj.close();
+//		buff.close();
+//		fileOut.close();
+//		
+//		attachment.setDataHandler(new DataHandler(new FileDataSource(tempFile)));
 		
-		File tempFile = File.createTempFile(r.getTitle(),".html");
-		tempFile.deleteOnExit();
-		
-		OutputStream fileOut = Files.newOutputStream(tempFile.toPath());
-		BufferedOutputStream buff = new BufferedOutputStream(fileOut);
-		ObjectOutputStream obj = new ObjectOutputStream(buff);
-		obj.writeObject(r);
-		obj.close();
-		buff.close();
-		fileOut.close();
-		
-		attachment.setDataHandler(new DataHandler(new FileDataSource(tempFile)));
+		attachment.setText(new RecipeHTML(r).getHTML());
+		attachment.addHeader("Content-Type", "text/html; charset=UTF-8");
 		attachment.setFileName(r.getTitle() + ".html");
 		
 		multi.addBodyPart(attachment);
 		
 		message.setContent(multi);
+		message.saveChanges();
 		
 		Transport transport = session.getTransport("smtp");
 		 
